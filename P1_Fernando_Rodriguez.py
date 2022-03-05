@@ -6,7 +6,7 @@ def filtroSobel(img):
     sobelY = cv2.Sobel(img,cv2.CV_16S,0,1)
     absX = cv2.convertScaleAbs(sobelX)
     absY = cv2.convertScaleAbs(sobelY)
-    return cv2.addWeighted(absX,0.8,absY,0.8,0)
+    return cv2.addWeighted(absX,0.5,absY,0.5,0)
     
 def dilatacion(img,it):
     k = np.ones((3,3),np.uint8)
@@ -21,26 +21,17 @@ def rotar(img):
 def cortar(img):
     return img[80:420,240:595] #Se recorta la imagen -> filaInicial:filaFinal,ColInicial:colFinal
 
-def filtroBilateral(img):
-    b = cv2.bilateralFilter(img,15,5,5)
-    return b
-
-def filtroBlur(img):
-    ksize = (3,3)
-    return cv2.blur(img,ksize)
-
-def gauBlur(img):
-    return cv2.GaussianBlur(img, (3,3),0) 
-
-def filtroMedian(img):
-    return cv2.medianBlur(img,3)
+def perfilado(img):
+    gb = cv2.GaussianBlur(img,(9,9),5)
+    return cv2.addWeighted(img,13.5,gb,-12.5,0)
 
 #Ejecucion principal del programa
-img = cv2.imread(r"examen_b.tif") #Abrimos imagen
-d = dilatacion(img,1)
-s = filtroSobel(d)
-b = gauBlur(s)
-final = cortar(rotar(b))
-cv2.imshow('P1_Fernando_Rodriguez',final) #Muestra imagen
+img = cv2.imread(r"examen_b.tif")
+img_dilatacion = dilatacion(img,2)
+img_sobel = filtroSobel(img_dilatacion)
+img_perfilado = perfilado(img_sobel)
+img_rotada = rotar(img_perfilado)
+img_cortada = cortar(img_rotada)
+cv2.imshow('P1_Fernando_Rodriguez',img_cortada) 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
